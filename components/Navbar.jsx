@@ -19,18 +19,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-
+    <nav className="bg-gradient-to-r from-blue-50 to-blue-100 shadow-md sticky top-0 z-50">
+      <div className="container mx-auto px-6 py-3 flex items-center justify-between">
+        
         {/* Logo */}
-
+        
         <Link to="/" className="flex items-center gap-2 text-decoration-none">
           <img
             src="https://www.shutterstock.com/image-vector/write-blog-post-icon-blogging-600nw-2417074323.jpg"
             alt="Logo"
-            className="h-8 w-8"
+            className="h-10 w-10 rounded-full shadow-sm"
           />
-          <span className="text-lg font-semibold">QuickPost</span>
+          <span className="text-xl font-bold text-blue-800">QuickPost</span>
         </Link>
 
         {/* Links */}
@@ -40,13 +40,13 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="px-4 py-2 border border-black-500 text-black-500 rounded hover:bg-white-50 transition text-decoration-none"
+                className="px-4 py-2 rounded-lg border border-blue-300 bg-white text-blue-700 font-medium shadow-sm hover:bg-blue-50 hover:text-blue-800 transition text-decoration-none"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="px-4 py-2 border border-black-500 text-black-500 rounded hover:bg-white-50 transition text-decoration-none"
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium shadow-sm hover:bg-blue-700 transition text-decoration-none"
               >
                 Sign Up
               </Link>
@@ -55,13 +55,13 @@ const Navbar = () => {
             <>
               <Link
                 to="/dashboard"
-                className="px-4 py-2 border border-green-500 text-green-500 rounded hover:bg-green-50 transition text-decoration-none"
+                className="px-4 py-2 rounded-lg border border-blue-500 text-blue-600 font-medium shadow-sm hover:bg-blue-50 transition text-decoration-none"
               >
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-white-500 text-black rounded hover:bg-black-600 transition text-decoration-none"
+                className="px-4 py-2 rounded-lg bg-red-500 text-black font-medium shadow-sm hover:bg-red-600 transition text-decoration-none"
               >
                 Logout
               </button>

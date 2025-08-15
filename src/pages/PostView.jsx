@@ -20,7 +20,7 @@ export default function PostDetails() {
     if (loading) {
         return (
             <div className="flex justify-center py-24">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-indigo-600" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-indigo-600" />
             </div>
         );
     }
@@ -28,36 +28,36 @@ export default function PostDetails() {
     if (!post) {
         return (
             <div className="mx-auto max-w-3xl px-4 py-12 text-center text-gray-600">
-                Post not found.
-                <div>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="mt-4 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
-                    >
-                        Go back
-                    </button>
-                </div>
+                <h2 className="text-xl font-semibold mb-4">Post not found</h2>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="mt-2 rounded-lg border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100 transition"
+                >
+                    Go Back
+                </button>
             </div>
         );
     }
 
     return (
-        <article className="container px-4 py-10">
+        <article className="container mx-auto px-4 py-10">
             <button
                 onClick={() => navigate(-1)}
-                className="mb-6 inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+                className="mb-6 inline-flex items-center rounded-lg border border-indigo-500 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100 transition"
             >
                 ← Back
             </button>
 
-            <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
-            <p className="mt-2 text-sm text-gray-500">
-                {post.author?.name ? `${post.author.name} • ` : ""}
-                {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
-            </p>
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-md">
+                <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
+                <p className="mt-2 text-sm text-gray-500">
+                    {post.author?.name ? `${post.author.name} • ` : ""}
+                    {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
+                </p>
 
-            <div className="prose prose-indigo mt-6 max-w-none">
-                <p className="whitespace-pre-wrap text-gray-800">{post.content}</p>
+                <div className="prose prose-indigo mt-6 max-w-none">
+                    <p className="whitespace-pre-wrap text-gray-800">{post.content}</p>
+                </div>
             </div>
         </article>
     );

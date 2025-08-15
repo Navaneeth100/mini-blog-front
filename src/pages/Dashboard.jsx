@@ -4,25 +4,40 @@ import { useNavigate } from "react-router-dom";
 import { url } from "../../mainurl";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const Dashboard = () => {
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modal, setmodal] = useState({ add: false, edit: false })
+  const [modal, setModal] = useState({ add: false, edit: false });
   const [currentPost, setCurrentPost] = useState(null);
   const [formData, setFormData] = useState({ title: "", content: "" });
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+  const [currentPage, setcurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchtext, setsearchtext] = useState("");
+
+  useEffect(() => {
+    fetchPosts()
+  }, [currentPage, searchtext]);
+
+  const handleFirst = () => setcurrentPage(1);
+  const handlePrev = () => setcurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNext = () => setcurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleLast = () => setcurrentPage(totalPages);
 
   const fetchPosts = async () => {
     try {
-      const res = await axios.get(`${url}/posts/`, {
+      const res = await axios.get(`${url}/posts/?page=${currentPage}&search=${searchtext}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts(res.data?.results || []);
+      setTotalPages(res.data?.pages || 1);
     } catch (e) {
       console.error(e);
     } finally {
@@ -34,46 +49,14 @@ const Dashboard = () => {
     fetchPosts();
   }, []);
 
-  const handleChange = (e) => setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const toggleModal = (type) => { setmodal((prev) => ({ ...prev, [type]: !prev[type] })) };
-
-  const resetForm = () => {
-    setFormData({ title: "", content: "" });
-  }
-
-  const handleAdd = async () => {
-    try {
-      const res = await axios.post(`${url}/posts/`, formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(res.data.message);
-      toggleModal('add');
-      resetForm()
-      fetchPosts();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const toggleModal = (type) => setModal((prev) => ({ ...prev, [type]: !prev[type] }));
 
   const handleEditClick = (post) => {
     setCurrentPost(post);
     setFormData({ title: post.title, content: post.content });
     toggleModal('edit');
-  };
-
-  const handleUpdate = async () => {
-    try {
-      const res = await axios.put(`${url}/posts/${currentPost._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success(res.data.message);
-      toggleModal('edit');
-      resetForm()
-      fetchPosts();
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   const handleDelete = async (id) => {
@@ -105,14 +88,23 @@ const Dashboard = () => {
   return (
     <div className="container px-4 py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">My Posts</h2>
-        <button
-          onClick={() => toggleModal('add')}
-          className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          + Add Post
-        </button>
-      </div>
+  <h2 className="text-2xl font-semibold text-gray-900">My Posts</h2>
+  <div className="flex items-center gap-2 w-full sm:w-auto">
+    <input
+      type="text"
+      value={searchtext}
+      onChange={(e) => setsearchtext(e.target.value)}
+      placeholder="Search by Title"
+      className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+    />
+    <button
+      onClick={() => toggleModal('add')}
+      className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    >
+      + Add Post
+    </button>
+  </div>
+</div>
 
       {/* Loading */}
 
@@ -122,16 +114,16 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Grid of cards (responsive) */}
-
+      {/* Grid of cards */}
+      
       {!loading && (
         <>
           {posts?.length ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 min-h-[50vh]">
               {posts.map((post) => (
                 <div
                   key={post._id}
-                  className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                  className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="mb-3">
                     <h3 className="line-clamp-2 text-lg font-semibold text-gray-900">
@@ -145,19 +137,19 @@ const Dashboard = () => {
                   <div className="mt-auto flex flex-wrap gap-2">
                     <button
                       onClick={() => navigate(`/posts/${post._id}`)}
-                      className="rounded-lg border border-transparent bg-white px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-sky-700"
+                      className="rounded-lg border border-transparent bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-200 transition"
                     >
                       Read more
                     </button>
                     <button
                       onClick={() => handleEditClick(post)}
-                      className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-gray-50"
+                      className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-gray-50 transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(post._id)}
-                      className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-rose-700"
+                      className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-rose-100 transition"
                     >
                       Delete
                     </button>
@@ -166,10 +158,46 @@ const Dashboard = () => {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-gray-300 p-10 text-center text-gray-600">
+            <div className="rounded-2xl border border-dashed border-gray-300 p-10 text-center text-gray-600 min-h-[50vh]">
               No posts found
             </div>
           )}
+
+        {/* Pagination */}
+
+        <div className="flex items-center justify-center gap-2 mt-10">
+          <button
+            onClick={handleFirst}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+          >
+            First
+          </button>
+          <button
+            onClick={handlePrev}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+          >
+            Prev
+          </button>
+          <span className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+          >
+            Next
+          </button>
+          <button
+            onClick={handleLast}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+          >
+            Last
+          </button>
+        </div>
         </>
       )}
 
@@ -189,62 +217,99 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  placeholder="Enter title"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Content
-                </label>
-                <textarea
-                  rows={5}
-                  name="content"
-                  value={formData.content}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  placeholder="Enter content"
-                />
-              </div>
-            </div>
+            <Formik
+              initialValues={{ title: "", content: "" }}
+              validationSchema={Yup.object({
+                title: Yup.string()
+                  .required("Title is required")
+                  .min(3, "Title too short"),
+                content: Yup.string()
+                  .required("Content is required")
+                  .min(10, "Content too short"),
+              })}
+              onSubmit={async (values, { setSubmitting, resetForm }) => {
+                try {
+                  const res = await axios.post(`${url}/posts/`, values, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  toast.success(res.data.message);
+                  toggleModal("add");
+                  fetchPosts();
+                  resetForm();
+                } catch (err) {
+                  toast.error(err.response?.data?.error || "Something went wrong!");
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              {({ isSubmitting }) => (
+                <Form className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Title
+                    </label>
+                    <Field
+                      type="text"
+                      name="title"
+                      placeholder="Enter title"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                    <ErrorMessage
+                      name="title"
+                      component="div"
+                      className="text-red-500 text-xs text-start italic mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Content
+                    </label>
+                    <Field
+                      as="textarea"
+                      rows={5}
+                      name="content"
+                      placeholder="Enter content"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                    <ErrorMessage
+                      name="content"
+                      component="div"
+                      className="text-red-500 text-xs text-start italic mt-1"
+                    />
+                  </div>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => toggleModal('add')}
-                className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAdd}
-                className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-              >
-                Save
-              </button>
-            </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleModal("add")}
+                      className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       )}
 
       {/* Edit Modal */}
-
       {modal.edit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold">Edit Post</h3>
               <button
-                onClick={() => toggleModal('edit')}
+                onClick={() => toggleModal("edit")}
                 className="rounded-full p-1 text-gray-500 hover:bg-gray-100"
                 aria-label="Close"
               >
@@ -252,49 +317,89 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  placeholder="Enter title"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Content
-                </label>
-                <textarea
-                  rows={5}
-                  name="content"
-                  value={formData.content}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                  placeholder="Enter content"
-                />
-              </div>
-            </div>
+            <Formik
+              enableReinitialize
+              initialValues={{ title: formData.title, content: formData.content }}
+              validationSchema={Yup.object({
+                title: Yup.string()
+                  .required("Title is required")
+                  .min(3, "Title too short"),
+                content: Yup.string()
+                  .required("Content is required")
+                  .min(10, "Content too short"),
+              })}
+              onSubmit={async (values, { setSubmitting }) => {
+                try {
+                  const res = await axios.put(
+                    `${url}/posts/${currentPost._id}`,
+                    values,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  toast.success(res.data.message);
+                  toggleModal("edit");
+                  fetchPosts();
+                } catch (err) {
+                  toast.error(err.response?.data?.error || "Something went wrong!");
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              {({ isSubmitting }) => (
+                <Form className="space-y-4">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Title
+                    </label>
+                    <Field
+                      type="text"
+                      name="title"
+                      placeholder="Enter title"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                    <ErrorMessage
+                      name="title"
+                      component="div"
+                      className="text-red-500 text-xs text-start italic mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Content
+                    </label>
+                    <Field
+                      as="textarea"
+                      rows={5}
+                      name="content"
+                      placeholder="Enter content"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    />
+                    <ErrorMessage
+                      name="content"
+                      component="div"
+                      className="text-red-500 text-xs text-start italic mt-1"
+                    />
+                  </div>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => toggleModal('edit')}
-                className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-              >
-                Update
-              </button>
-            </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleModal("edit")}
+                      className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       )}
