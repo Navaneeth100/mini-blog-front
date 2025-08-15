@@ -7,7 +7,7 @@ import { url } from '../../mainurl';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Lottie from 'lottie-react';
-import animationData from '../../Lottie/Register.json'; 
+import animationData from '../Lottie/Register.json'; 
 
 export default function Register() {
     const navigate = useNavigate();

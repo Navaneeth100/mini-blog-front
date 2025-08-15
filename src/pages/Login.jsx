@@ -8,7 +8,7 @@ import { Lock, Unlock } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Lottie from 'lottie-react';
-import animationData from '../../lottie/Login.json';
+import animationData from '../Lottie/Login.json';
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
