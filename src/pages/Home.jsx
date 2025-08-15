@@ -37,17 +37,17 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
 
         {/* Header and Search */}
-        
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
               {user ? `Welcome ${user.name}` : "Latest Posts"}
             </h2>
-              {user ? (
-                <p className="mt-3 text-lg text-gray-600">
-                  Explore your posts, stay updated with the latest content, and share your thoughts with the community.
-                </p>
-              ) : (
+            {user ? (
+              <p className="mt-3 text-lg text-gray-600">
+                Explore your posts, stay updated with the latest content, and share your thoughts with the community.
+              </p>
+            ) : (
               <p className="mt-2 text-lg text-gray-600">
                 Stay updated with our latest articles and insights.
               </p>
@@ -80,6 +80,21 @@ export default function Home() {
                 key={post._id}
                 className="flex flex-col justify-between shadow-md hover:shadow-md transition-shadow duration-300 p-6 rounded-xl bg-white border border-gray-100"
               >
+
+                {post.image ? (
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                ) : (
+                  <img
+                    src=""
+                    alt=""
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                )}
+                
                 <div className="flex items-center gap-x-4 text-xs text-gray-500">
                   <time dateTime={post.createdAt}>
                     {new Date(post.createdAt).toLocaleDateString()}
@@ -100,17 +115,17 @@ export default function Home() {
                       | {post.author?.email || ""}
                     </span>
                   </p>
-                   <button
-                      onClick={() => navigate(`/posts/${post._id}`)}
-                      className="rounded-lg border border-transparent bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-200 transition"
-                    >
-                      Read more
-                    </button>
+                  <button
+                    onClick={() => navigate(`/posts/${post._id}`)}
+                    className="rounded-lg border border-transparent bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-200 transition"
+                  >
+                    Read more
+                  </button>
                 </div>
               </article>
             ))
           ) : (
-            <div className="flex items-center justify-center text-center w-full min-h-[50vh]">
+            <div className="col-span-full flex flex-col items-center justify-center text-center w-full min-h-[50vh]">
               <p className="text-gray-500 text-lg font-medium">
                 No posts found
               </p>

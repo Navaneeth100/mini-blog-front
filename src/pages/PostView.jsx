@@ -49,6 +49,21 @@ export default function PostDetails() {
             </button>
 
             <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-md">
+
+            {post.image ? (
+                <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-64 object-cover rounded-xl mb-6"
+                />
+            ) : (
+                <img
+                    src=""
+                    alt=""
+                    className="w-full h-64 object-cover rounded-xl mb-6"
+                />
+            )}
+            
                 <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
                 <p className="mt-2 text-sm text-gray-500">
                     {post.author?.name ? `${post.author.name} • ` : ""}

@@ -88,23 +88,23 @@ const Dashboard = () => {
   return (
     <div className="container px-4 py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-  <h2 className="text-2xl font-semibold text-gray-900">My Posts</h2>
-  <div className="flex items-center gap-2 w-full sm:w-auto">
-    <input
-      type="text"
-      value={searchtext}
-      onChange={(e) => setsearchtext(e.target.value)}
-      placeholder="Search by Title"
-      className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
-    />
-    <button
-      onClick={() => toggleModal('add')}
-      className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-    >
-      + Add Post
-    </button>
-  </div>
-</div>
+        <h2 className="text-2xl font-semibold text-gray-900">My Posts</h2>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <input
+            type="text"
+            value={searchtext}
+            onChange={(e) => setsearchtext(e.target.value)}
+            placeholder="Search by Title"
+            className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          />
+          <button
+            onClick={() => toggleModal('add')}
+            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            + Add Post
+          </button>
+        </div>
+      </div>
 
       {/* Loading */}
 
@@ -115,7 +115,7 @@ const Dashboard = () => {
       )}
 
       {/* Grid of cards */}
-      
+
       {!loading && (
         <>
           {posts?.length ? (
@@ -125,6 +125,21 @@ const Dashboard = () => {
                   key={post._id}
                   className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
                 >
+                  
+                  {post.image ? (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                  ) : (
+                    <img
+                      src=""
+                      alt=""
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                  )}
+
                   <div className="mb-3">
                     <h3 className="line-clamp-2 text-lg font-semibold text-gray-900">
                       {post.title}
@@ -163,41 +178,41 @@ const Dashboard = () => {
             </div>
           )}
 
-        {/* Pagination */}
+          {/* Pagination */}
 
-        <div className="flex items-center justify-center gap-2 mt-10">
-          <button
-            onClick={handleFirst}
-            disabled={currentPage === 1}
-            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
-          >
-            First
-          </button>
-          <button
-            onClick={handlePrev}
-            disabled={currentPage === 1}
-            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
-          >
-            Prev
-          </button>
-          <span className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
-          >
-            Next
-          </button>
-          <button
-            onClick={handleLast}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
-          >
-            Last
-          </button>
-        </div>
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <button
+              onClick={handleFirst}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+            >
+              First
+            </button>
+            <button
+              onClick={handlePrev}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+            >
+              Prev
+            </button>
+            <span className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+            >
+              Next
+            </button>
+            <button
+              onClick={handleLast}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50 transition"
+            >
+              Last
+            </button>
+          </div>
         </>
       )}
 
