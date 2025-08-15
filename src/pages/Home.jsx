@@ -38,7 +38,7 @@ export default function Home() {
 
         {/* Header and Search */}
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
               {user ? `Welcome ${user.name}` : "Latest Posts"}
@@ -48,8 +48,8 @@ export default function Home() {
                 Explore your posts, stay updated with the latest content, and share your thoughts with the community.
               </p>
             ) : (
-              <p className="mt-2 text-lg text-gray-600">
-                Stay updated with our latest articles and insights.
+              <p className="mt-3 text-lg text-gray-600">
+                Join our community today—sign up or log in to stay ahead with our latest content.
               </p>
             )}
           </div>
@@ -68,7 +68,7 @@ export default function Home() {
 
         <div
           className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 
-          sm:mt-12 sm:pt-10 lg:mx-0 lg:max-w-none lg:grid-cols-3 min-h-[50vh]"
+          sm:mt-0 sm:pt-10 lg:mx-0 lg:max-w-none lg:grid-cols-3 min-h-[50vh]"
         >
           {loading ? (
             <p className="col-span-full text-center text-gray-500 text-lg font-medium">
@@ -119,7 +119,7 @@ export default function Home() {
                     onClick={() => navigate(`/posts/${post._id}`)}
                     className="rounded-lg border border-transparent bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-200 transition"
                   >
-                    Read more
+                    View
                   </button>
                 </div>
               </article>

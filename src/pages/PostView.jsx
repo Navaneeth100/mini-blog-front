@@ -54,7 +54,7 @@ export default function PostDetails() {
                 <img
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-64 object-cover rounded-xl mb-6"
+                    className="w-full h-64 object-contain rounded-xl mb-6"
                 />
             ) : (
                 <img

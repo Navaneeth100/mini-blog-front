@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const fetchPosts = async () => {
     try {
-      const res = await axios.get(`${url}/posts/?page=${currentPage}&search=${searchtext}`, {
+      const res = await axios.get(`${url}/posts/my-posts?page=${currentPage}&search=${searchtext}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts(res.data?.results || []);
@@ -44,10 +44,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -99,7 +95,7 @@ const Dashboard = () => {
           />
           <button
             onClick={() => toggleModal('add')}
-            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             + Add Post
           </button>
@@ -173,9 +169,11 @@ const Dashboard = () => {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-gray-300 p-10 text-center text-gray-600 min-h-[50vh]">
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="rounded-2xl p-10 text-center text-gray-600">
               No posts found
             </div>
+          </div>
           )}
 
           {/* Pagination */}
@@ -233,19 +231,24 @@ const Dashboard = () => {
             </div>
 
             <Formik
-              initialValues={{ title: "", content: "" }}
+              initialValues={{ title: "", content: "", image: null }}
               validationSchema={Yup.object({
                 title: Yup.string()
-                  .required("Title is required")
-                  .min(3, "Title too short"),
+                .required("Title is required")
+                .min(3, "Title too short"),
                 content: Yup.string()
-                  .required("Content is required")
-                  .min(10, "Content too short"),
+                .required("Content is required")
+                .min(10, "Content too short"),
               })}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 try {
-                  const res = await axios.post(`${url}/posts/`, values, {
-                    headers: { Authorization: `Bearer ${token}` },
+                  const fd = new FormData();
+                  fd.append("title", values.title);
+                  fd.append("content", values.content);
+                  if (values.image) fd.append("image", values.image);
+
+                  const res = await axios.post(`${url}/posts/`, fd, {
+                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
                   });
                   toast.success(res.data.message);
                   toggleModal("add");
@@ -258,28 +261,28 @@ const Dashboard = () => {
                 }
               }}
             >
-              {({ isSubmitting }) => (
+              {({ setFieldValue, values, isSubmitting }) => (
                 <Form className="space-y-4">
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       Title
-                    </label>
+                      </label>
                     <Field
                       type="text"
                       name="title"
                       placeholder="Enter title"
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
-                    <ErrorMessage
-                      name="title"
-                      component="div"
-                      className="text-red-500 text-xs text-start italic mt-1"
+                    <ErrorMessage 
+                    name="title" 
+                    component="div" 
+                    className="text-red-500 text-xs text-start italic mt-1" 
                     />
                   </div>
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       Content
-                    </label>
+                      </label>
                     <Field
                       as="textarea"
                       rows={5}
@@ -287,11 +290,28 @@ const Dashboard = () => {
                       placeholder="Enter content"
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
-                    <ErrorMessage
-                      name="content"
-                      component="div"
-                      className="text-red-500 text-xs text-start italic mt-1"
+                    <ErrorMessage 
+                    name="content" 
+                    component="div" 
+                    className="text-red-500 text-xs text-start italic mt-1"
+                     />
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFieldValue("image", e.currentTarget.files[0])}
+                      className="w-full"
                     />
+                    {values.image && (
+                      <img
+                        src={URL.createObjectURL(values.image)}
+                        alt="Preview"
+                        className="mt-2 w-32 h-32 object-cover rounded-lg"
+                      />
+                    )}
                   </div>
 
                   <div className="mt-4 flex justify-end gap-2">
@@ -334,22 +354,27 @@ const Dashboard = () => {
 
             <Formik
               enableReinitialize
-              initialValues={{ title: formData.title, content: formData.content }}
+              initialValues={{ title: formData.title, content: formData.content, image: null }}
               validationSchema={Yup.object({
                 title: Yup.string()
-                  .required("Title is required")
-                  .min(3, "Title too short"),
+                .required("Title is required")
+                .min(3, "Title too short"),
                 content: Yup.string()
-                  .required("Content is required")
-                  .min(10, "Content too short"),
+                .required("Content is required")
+                .min(10, "Content too short"),
               })}
               onSubmit={async (values, { setSubmitting }) => {
                 try {
+                  const fd = new FormData();
+                  fd.append("title", values.title);
+                  fd.append("content", values.content);
+                  if (values.image) fd.append("image", values.image);
+
                   const res = await axios.put(
                     `${url}/posts/${currentPost._id}`,
-                    values,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                  );
+                     fd, 
+                     {headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+                  });
                   toast.success(res.data.message);
                   toggleModal("edit");
                   fetchPosts();
@@ -360,28 +385,28 @@ const Dashboard = () => {
                 }
               }}
             >
-              {({ isSubmitting }) => (
+              {({ setFieldValue, values, isSubmitting }) => (
                 <Form className="space-y-4">
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       Title
-                    </label>
+                      </label>
                     <Field
                       type="text"
                       name="title"
                       placeholder="Enter title"
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
-                    <ErrorMessage
-                      name="title"
-                      component="div"
-                      className="text-red-500 text-xs text-start italic mt-1"
-                    />
+                    <ErrorMessage 
+                    name="title" 
+                    component="div" 
+                    className="text-red-500 text-xs text-start italic mt-1"
+                     />
                   </div>
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-700">
                       Content
-                    </label>
+                      </label>
                     <Field
                       as="textarea"
                       rows={5}
@@ -389,11 +414,26 @@ const Dashboard = () => {
                       placeholder="Enter content"
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                     />
-                    <ErrorMessage
-                      name="content"
-                      component="div"
-                      className="text-red-500 text-xs text-start italic mt-1"
+                    <ErrorMessage 
+                    name="content" 
+                    component="div" 
+                    className="text-red-500 text-xs text-start italic mt-1"
+                     />
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFieldValue("image", e.currentTarget.files[0])}
+                      className="w-full"
                     />
+                    {values.image ? (
+                      <img src={URL.createObjectURL(values.image)} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-lg" />
+                    ) : currentPost.image ? (
+                      <img src={currentPost.image} alt="Current" className="mt-2 w-32 h-32 object-cover rounded-lg" />
+                    ) : null}
                   </div>
 
                   <div className="mt-4 flex justify-end gap-2">

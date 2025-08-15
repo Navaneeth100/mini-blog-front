@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from '../src/assets/image.png'
 
 const Navbar = () => {
 
@@ -26,7 +27,7 @@ const Navbar = () => {
         
         <Link to="/" className="flex items-center gap-2 text-decoration-none">
           <img
-            src="https://www.shutterstock.com/image-vector/write-blog-post-icon-blogging-600nw-2417074323.jpg"
+            src={Logo}
             alt="Logo"
             className="h-10 w-10 rounded-full shadow-sm"
           />

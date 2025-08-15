@@ -28,7 +28,10 @@ export default function Login() {
                 toast.success(res.data.message)
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('user', JSON.stringify(res.data.user));
+                setTimeout(() => {
                 navigate(`/`);
+                window.location.reload()
+                }, 1500);
             }
         } catch (err) {
             toast.error(err.response?.data?.error);
@@ -46,7 +49,7 @@ export default function Login() {
                 </div>
 
                 {/* Right Form */}
-                
+
                 <div className="md:col-span-6">
                     <h2 className="text-3xl font-extrabold mb-6 text-black-700 text-center md:text-left">Login</h2>
 

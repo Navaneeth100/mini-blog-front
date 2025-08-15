@@ -21,6 +21,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/posts/:id" element={<PostView />} />
 
         {/* Protected Routes */}
 
@@ -32,17 +33,17 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/posts/:id"
           element={
             <ProtectedRoute>
               <PostView />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route path="/permission-denied" element={<PermissionDenied />} />
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={1500} />
     </>
   );
 }
